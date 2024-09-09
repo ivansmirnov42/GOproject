@@ -1,4 +1,4 @@
-package GOproject
+package main
 
 import "gorm.io/gorm"
 
