@@ -1,4 +1,4 @@
-module main
+module GOproject
 
 go 1.22
 

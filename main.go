@@ -1,6 +1,8 @@
-package GOproject
+package main
 
 import (
+	"GOproject/db"
+	"GOproject/orm"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -23,18 +25,19 @@ func PostMessage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	message = reqBody.Message
-	DB.Create(&reqBody)
+	db.DB.Create(&orm.Message{Text: message})
 
 }
 
 func GetMessage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %v", message)
+	var message []orm.Message
+	db.DB.Find(&message)
+	json.NewEncoder(w).Encode(message)
 }
 
 func main() {
-	InitDB()
-
-	err := DB.AutoMigrate(&Message{})
+	db.InitDB()
+	err := db.DB.AutoMigrate(&orm.Message{})
 
 	if err != nil {
 		fmt.Println(err)
