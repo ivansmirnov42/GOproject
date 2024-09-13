@@ -1,8 +1,8 @@
 package main
 
 import (
-	"GOproject/db"
-	"GOproject/orm"
+	"GOproject/database"
+	"GOproject/messagesSerivce"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -18,7 +18,6 @@ var message string
 
 func PostMessage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	var reqBody requestBody
 	err := json.NewDecoder(r.Body).Decode(&reqBody)
@@ -26,21 +25,22 @@ func PostMessage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	message = reqBody.Message
-	db.DB.Create(&orm.Message{Text: message})
+	database.DB.Create(&messagesSerivce.Message{Text: message})
+	w.WriteHeader(http.StatusOK)
 
 }
 
 func GetMessage(w http.ResponseWriter, r *http.Request) {
-	var message []orm.Message
-	db.DB.Find(&message)
+	var message []messagesSerivce.Message
+	database.DB.Find(&message)
 	json.NewEncoder(w).Encode(message)
+
 }
 
 func PatchMessage(w http.ResponseWriter, r *http.Request) {
 	var id string
 	var new_message string
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	var reqBody requestBody
 	err := json.NewDecoder(r.Body).Decode(&reqBody)
@@ -49,13 +49,13 @@ func PatchMessage(w http.ResponseWriter, r *http.Request) {
 	}
 	new_message = reqBody.Message
 	id = reqBody.Id
-	db.DB.Model(&orm.Message{}).Where("id = ?", id).Update("text", new_message)
+	database.DB.Model(&messagesSerivce.Message{}).Where("id = ?", id).Update("text", new_message)
+	w.WriteHeader(http.StatusOK)
 }
 
 func DeleteMessage(w http.ResponseWriter, r *http.Request) {
 	var id string
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	var reqBody requestBody
 	err := json.NewDecoder(r.Body).Decode(&reqBody)
@@ -63,12 +63,13 @@ func DeleteMessage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	id = reqBody.Id
-	db.DB.Where("id = ?", id).Delete(&orm.Message{})
+	database.DB.Where("id = ?", id).Delete(&messagesSerivce.Message{})
+	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
-	db.InitDB()
-	err := db.DB.AutoMigrate(&orm.Message{})
+	database.InitDB()
+	err := database.DB.AutoMigrate(&messagesSerivce.Message{})
 
 	if err != nil {
 		fmt.Println(err)

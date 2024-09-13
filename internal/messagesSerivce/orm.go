@@ -1,4 +1,4 @@
-package orm
+package messagesSerivce
 
 import "gorm.io/gorm"
 
