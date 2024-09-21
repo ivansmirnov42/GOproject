@@ -1,4 +1,4 @@
-package messagesSerivce
+package messagesService
 
 import "gorm.io/gorm"
 
