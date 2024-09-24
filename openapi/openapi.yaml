@@ -35,6 +35,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
+    patch:
+      summary: Change a message
+      tags:
+        - messages
+      requestBody:
+        description: The message to change
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '201':
+          description: The changed message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    delete:
+      summary: Delete a message
+      tags:
+        - messages
+      requestBody:
+        description: The message to delete
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '200':
+          description: The deleted message
 
 components:
   schemas:

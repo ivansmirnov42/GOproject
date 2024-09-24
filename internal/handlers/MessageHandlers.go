@@ -4,8 +4,7 @@ import (
 	"GOproject/internal/messagesService"
 	"GOproject/internal/web/messages"
 	"context"
-	"encoding/json"
-	"net/http"
+	"gorm.io/gorm"
 )
 
 type Handler struct {
@@ -45,49 +44,48 @@ func (h *Handler) GetMessages(_ context.Context, _ messages.GetMessagesRequestOb
 }
 
 func (h *Handler) PostMessages(_ context.Context, request messages.PostMessagesRequestObject) (messages.PostMessagesResponseObject, error) {
-	// Распаковываем тело запроса напрямую, без декодера!
 	messageRequest := request.Body
-	// Обращаемся к сервису и создаем сообщение
 	messageToCreate := messagesService.Message{Text: *messageRequest.Message}
 	createdMessage, err := h.Service.CreateMessage(messageToCreate)
 
 	if err != nil {
 		return nil, err
 	}
-	// создаем структуру респонс
+
 	response := messages.PostMessages201JSONResponse{
 		Id:      &createdMessage.ID,
 		Message: &createdMessage.Text,
 	}
-	// Просто возвращаем респонс!
+
 	return response, nil
 }
 
-func (h *Handler) DeleteMessageHandler(w http.ResponseWriter, r *http.Request) {
-	var message messagesService.Message
-	err := json.NewDecoder(r.Body).Decode(&message)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+func (h *Handler) DeleteMessages(_ context.Context, request messages.DeleteMessagesRequestObject) (messages.DeleteMessagesResponseObject, error) {
+	messageRequest := request.Body
+	id := messagesService.Message{
+		Model: gorm.Model{ID: *messageRequest.Id},
 	}
-
-	err = h.Service.DeleteMessageByID(int(message.ID))
+	err := h.Service.DeleteMessageByID(int(id.ID))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return nil, err
 	}
+	return nil, nil
 }
 
-func (h *Handler) PutMessageHandler(w http.ResponseWriter, r *http.Request) {
-	var message messagesService.Message
-	err := json.NewDecoder(r.Body).Decode(&message)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+func (h *Handler) PatchMessages(_ context.Context, request messages.PatchMessagesRequestObject) (messages.PatchMessagesResponseObject, error) {
+	messageRequest := request.Body
+	NewMessage := messagesService.Message{Text: *messageRequest.Message}
+	id := messagesService.Message{
+		Model: gorm.Model{ID: *messageRequest.Id},
 	}
-	newMessage, err := h.Service.UpdateMessageByID(int(message.ID), message)
+	changedMessage, err := h.Service.UpdateMessageByID(int(id.ID), NewMessage)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil, err
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(newMessage)
+	response := messages.PatchMessages201JSONResponse{
+		Id:      &id.ID,
+		Message: &changedMessage.Text,
+	}
+
+	return response, nil
 }
