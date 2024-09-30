@@ -67,7 +67,70 @@ paths:
       responses:
         '200':
           description: The deleted message
-
+  /users:
+    get:
+      summary: Get all users
+      tags:
+        - users
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a new user
+      tags:
+        - users
+      requestBody:
+        description: The user to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: The created user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    patch:
+      summary: Change a user
+      tags:
+        - users
+      requestBody:
+        description: The user to change
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: The changed user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      summary: Delete a user
+      tags:
+        - users
+      requestBody:
+        description: The message to delete
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: The deleted message
 components:
   schemas:
     Message:
@@ -77,4 +140,14 @@ components:
           type: integer
           format: uint # так как в БД айди это только положительные числа.
         message:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint
+        password:
+          type: string
+        email:
           type: string

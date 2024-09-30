@@ -20,3 +20,6 @@ lint:
 # для удобства добавим команду run, которая будет запускать наше приложение
 run:
 	go run cmd/app/main.go # Теперь при вызове make run мы запустим наш сервер
+
+genuser:
+	oapi-codegen -config openapi/.openapi -include-tags users -package users openapi/openapi.yaml > ./internal/web/users/api.gen.go
